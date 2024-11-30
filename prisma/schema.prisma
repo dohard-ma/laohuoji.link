@@ -1,0 +1,71 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String
+  name          String?
+  avatar        String?
+  bio           String?
+  specialties   String[]  // 擅长领域
+  needs         String[]  // 需求领域
+  tags          Tag[]     @relation("UserTags")
+  badges        Badge[]   @relation("UserBadges")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  comments      Comment[]
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  users     User[]   @relation("UserTags")
+  products  Product[] @relation("ProductTags")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Badge {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  imageUrl    String
+  type        String   // 'course' | 'participation'
+  users       User[]   @relation("UserBadges")
+}
+
+model Product {
+  id          String    @id @default(cuid())
+  title       String
+  description String
+  price       Float
+  type        String    // 'course' | 'product'
+  imageUrl    String?
+  qrCode      String?   // 微信群二维码
+  syllabus    Json?     // 课程大纲
+  tags        Tag[]     @relation("ProductTags")
+  comments    Comment[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([productId])
+}
