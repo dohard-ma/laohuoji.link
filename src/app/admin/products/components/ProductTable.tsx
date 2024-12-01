@@ -7,6 +7,11 @@ import { useRouter } from "next/navigation";
 type ProductTableProps = {
   products: (Product & {
     tags: Tag[];
+    platform: {
+      id: string;
+      name: string;
+      icon: string;
+    };
   })[];
 };
 
@@ -40,10 +45,7 @@ export default function ProductTable({ products }: ProductTableProps) {
               标题
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-              价格
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-              类型
+              平台
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
               标签
@@ -69,8 +71,18 @@ export default function ProductTable({ products }: ProductTableProps) {
                 )}
               </td>
               <td className="px-6 py-4">{product.title}</td>
-              <td className="px-6 py-4">¥{product.price.toFixed(2)}</td>
-              <td className="px-6 py-4">{product.type === "course" ? "课程" : "产品"}</td>
+              <td className="px-6 py-4">
+                <div className="flex items-center gap-2">
+                  <Image
+                    src={product.platform.icon}
+                    alt={product.platform.name}
+                    width={20}
+                    height={20}
+                    className="object-contain"
+                  />
+                  <span>{product.platform.name}</span>
+                </div>
+              </td>
               <td className="px-6 py-4">
                 <div className="flex flex-wrap gap-1">
                   {product.tags.map((tag) => (

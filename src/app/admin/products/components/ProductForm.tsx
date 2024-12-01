@@ -1,15 +1,22 @@
 "use client";
 
-import { Tag } from "@prisma/client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { Tag } from "@prisma/client";
+
+type Platform = {
+  id: string;
+  name: string;
+  icon: string;
+};
 
 type ProductFormProps = {
   tags: Tag[];
+  platforms: Platform[];
 };
 
-export default function ProductForm({ tags }: ProductFormProps) {
+export default function ProductForm({ tags, platforms }: ProductFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -17,8 +24,8 @@ export default function ProductForm({ tags }: ProductFormProps) {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    price: "",
-    type: "course",
+    platformId: "",
+    platformUrl: "",
     tagIds: [] as string[],
   });
 
@@ -29,7 +36,6 @@ export default function ProductForm({ tags }: ProductFormProps) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // 创建预览
     const reader = new FileReader();
     reader.onloadend = () => {
       if (type === "cover") {
@@ -50,24 +56,15 @@ export default function ProductForm({ tags }: ProductFormProps) {
       const coverInput = e.currentTarget.querySelector('input[name="cover"]') as HTMLInputElement;
       const qrCodeInput = e.currentTarget.querySelector('input[name="qrcode"]') as HTMLInputElement;
 
-      // 添加封面图片
       if (coverInput.files?.[0]) {
         formDataToSend.append("cover", coverInput.files[0]);
       }
 
-      // 添加二维码图片
       if (qrCodeInput.files?.[0]) {
         formDataToSend.append("qrcode", qrCodeInput.files[0]);
       }
 
-      // 添加其他数据
-      formDataToSend.append(
-        "data",
-        JSON.stringify({
-          ...formData,
-          price: parseFloat(formData.price),
-        })
-      );
+      formDataToSend.append("data", JSON.stringify(formData));
 
       const res = await fetch("/api/admin/products", {
         method: "POST",
@@ -80,8 +77,8 @@ export default function ProductForm({ tags }: ProductFormProps) {
       setFormData({
         title: "",
         description: "",
-        price: "",
-        type: "course",
+        platformId: "",
+        platformUrl: "",
         tagIds: [],
       });
       setImagePreview(null);
@@ -89,7 +86,6 @@ export default function ProductForm({ tags }: ProductFormProps) {
       if (coverInput) coverInput.value = "";
       if (qrCodeInput) qrCodeInput.value = "";
 
-      // 刷新列表
       router.refresh();
     } catch (error) {
       console.error("提交失败:", error);
@@ -126,29 +122,32 @@ export default function ProductForm({ tags }: ProductFormProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">价格</label>
-            <input
-              type="number"
-              value={formData.price}
-              onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-              className="w-full px-3 py-2 border rounded-md"
-              min="0"
-              step="0.01"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">类型</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">平台</label>
             <select
-              value={formData.type}
-              onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+              value={formData.platformId}
+              onChange={(e) => setFormData({ ...formData, platformId: e.target.value })}
               className="w-full px-3 py-2 border rounded-md"
               required
             >
-              <option value="course">课程</option>
-              <option value="product">产品</option>
+              <option value="">选择平台</option>
+              {platforms.map((platform) => (
+                <option key={platform.id} value={platform.id}>
+                  {platform.name}
+                </option>
+              ))}
             </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">平台链接</label>
+            <input
+              type="url"
+              value={formData.platformUrl}
+              onChange={(e) => setFormData({ ...formData, platformUrl: e.target.value })}
+              className="w-full px-3 py-2 border rounded-md"
+              required
+              placeholder="https://..."
+            />
           </div>
 
           <div>
@@ -192,28 +191,26 @@ export default function ProductForm({ tags }: ProductFormProps) {
             )}
           </div>
 
-          {formData.type === "course" && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">微信群二维码</label>
-              <input
-                type="file"
-                name="qrcode"
-                accept="image/*"
-                onChange={(e) => handleImageChange(e, "qrcode")}
-                className="w-full"
-              />
-              {qrCodePreview && (
-                <div className="mt-4 relative aspect-square w-48 mx-auto">
-                  <Image
-                    src={qrCodePreview}
-                    alt="二维码预览"
-                    fill
-                    className="object-contain rounded-md"
-                  />
-                </div>
-              )}
-            </div>
-          )}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">微信群二维码</label>
+            <input
+              type="file"
+              name="qrcode"
+              accept="image/*"
+              onChange={(e) => handleImageChange(e, "qrcode")}
+              className="w-full"
+            />
+            {qrCodePreview && (
+              <div className="mt-4 relative aspect-square w-48 mx-auto">
+                <Image
+                  src={qrCodePreview}
+                  alt="二维码预览"
+                  fill
+                  className="object-contain rounded-md"
+                />
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

@@ -45,8 +45,9 @@ model Product {
   id          String    @id @default(cuid())
   title       String
   description String
-  price       Float
-  type        String    // 'course' | 'product'
+  platform    Platform  @relation(fields: [platformId], references: [id])
+  platformId  String
+  platformUrl String    // 外部平台的链接
   imageUrl    String?
   qrCode      String?   // 微信群二维码
   syllabus    Json?     // 课程大纲
@@ -54,6 +55,9 @@ model Product {
   comments    Comment[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  messages    GroupMessage[]
+
+  @@index([platformId])
 }
 
 model Comment {
@@ -67,5 +71,25 @@ model Comment {
   updatedAt DateTime @updatedAt
 
   @@index([userId])
+  @@index([productId])
+}
+
+model Platform {
+  id        String    @id @default(cuid())
+  name      String    @unique    // 平台名称
+  icon      String               // 平台图标
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model GroupMessage {
+  id        String   @id @default(cuid())
+  content   String   @db.Text    // 消息内容
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([productId])
 }

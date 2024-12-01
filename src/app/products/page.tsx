@@ -84,15 +84,9 @@ export default async function ProductsPage({
     where,
     include: {
       tags: true,
+      platform: true,
     },
     orderBy: [
-      // 标签匹配的排在最前面
-      {
-        tags: {
-          _count: "desc",
-        },
-      },
-      // 然后是创建时间
       {
         createdAt: "desc",
       },

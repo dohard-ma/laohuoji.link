@@ -44,8 +44,8 @@ export async function POST(request: Request) {
       data: {
         title: data.title,
         description: data.description,
-        price: data.price,
-        type: data.type,
+        platformId: data.platformId,
+        platformUrl: data.platformUrl,
         imageUrl,
         qrCode,
         tags: {
@@ -88,37 +88,10 @@ export async function PUT(request: Request) {
 // 添加删除产品的处理
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   try {
-    const product = await prisma.$transaction(async (tx) => {
-      // 获取产品的标签
-      const product = await tx.product.findUnique({
-        where: { id: params.id },
-        include: { tags: true },
-      });
-
-      if (!product) {
-        throw new Error("产品不存在");
-      }
-
-      // 更新标签使用次数
-      await tx.tag.updateMany({
-        where: {
-          id: {
-            in: product.tags.map((tag) => tag.id),
-          },
-        },
-        data: {
-          count: {
-            decrement: 1,
-          },
-        },
-      });
-
-      // 删除产品
-      await tx.product.delete({
-        where: { id: params.id },
-      });
-
-      return product;
+    // 直接删除产品即可
+    const product = await prisma.product.delete({
+      where: { id: params.id },
+      include: { tags: true }, // 可选：如果需要返回被删除的产品信息
     });
 
     return NextResponse.json(product);

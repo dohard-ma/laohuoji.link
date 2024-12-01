@@ -27,17 +27,6 @@ export async function middleware(request: NextRequest) {
     return path.startsWith(pattern);
   });
 
-  console.log("中间件处理请求:", {
-    path,
-    isAuthRoute,
-    hasToken: !!token,
-    tokenInfo: {
-      email: token?.email,
-      name: token?.name,
-      userId: token?.sub,
-    },
-  });
-
   if (isAuthRoute && !token) {
     if (path.startsWith("/api")) {
       return NextResponse.json({ error: "请先登录" }, { status: 401 });

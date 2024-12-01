@@ -1,10 +1,11 @@
-import { Product, Tag } from "@prisma/client";
+import { Product, Tag, Platform } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
 
 type ProductListProps = {
   products: (Product & {
     tags: Tag[];
+    platform: Platform;
   })[];
 };
 
@@ -14,8 +15,8 @@ export default function ProductList({ products }: ProductListProps) {
       {products.map((product) => (
         <Link
           key={product.id}
-          href={product.type === "course" ? `/courses/${product.id}` : `/products/${product.id}`}
-          className="block bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+          href={`/products/${product.id}`}
+          className="block bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow relative"
         >
           {product.imageUrl && (
             <div className="relative h-48">
@@ -25,7 +26,16 @@ export default function ProductList({ products }: ProductListProps) {
           <div className="p-6">
             <div className="flex items-center justify-between mb-2">
               <h2 className="text-xl font-semibold">{product.title}</h2>
-              <span className="text-blue-600 font-medium">¥{product.price.toFixed(2)}</span>
+              <div className="flex items-center gap-2">
+                <Image
+                  src={product.platform.icon}
+                  alt={product.platform.name}
+                  width={24}
+                  height={24}
+                  className="object-contain"
+                />
+                <span className="text-sm text-gray-500">{product.platform.name}</span>
+              </div>
             </div>
             <p className="text-gray-600 mb-4 line-clamp-2">{product.description}</p>
             <div className="flex flex-wrap gap-2">

@@ -1,10 +1,11 @@
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import CommentSection from "@/app/courses/[id]/components/CommentSection";
-import CourseContent from "@/app/courses/[id]/components/CourseContent";
+import CommentSection from "../components/CommentSection";
+import CourseContent from "../components/CourseContent";
 import { Metadata } from "next";
-import { Product, Tag, Comment } from "@prisma/client";
+import { Product, Tag, Comment, Platform } from "@prisma/client";
+import GroupMessages from "../components/GroupMessages";
 
 type Props = {
   params: { id: string };
@@ -12,6 +13,7 @@ type Props = {
 
 type ProductWithRelations = Product & {
   tags: Tag[];
+  platform: Platform;
   comments: (Comment & {
     user: {
       name: string | null;
@@ -20,6 +22,7 @@ type ProductWithRelations = Product & {
   })[];
   syllabus?: any;
   qrCode?: string | null;
+  messages: any[];
 };
 
 // 动态生成页面元数据
@@ -47,6 +50,7 @@ export default async function ProductPage({ params }: Props) {
     },
     include: {
       tags: true,
+      platform: true,
       comments: {
         include: {
           user: {
@@ -56,6 +60,11 @@ export default async function ProductPage({ params }: Props) {
             },
           },
         },
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
+      messages: {
         orderBy: {
           createdAt: "desc",
         },
@@ -98,8 +107,8 @@ export default async function ProductPage({ params }: Props) {
             <p className="text-gray-600 whitespace-pre-line">{product.description}</p>
           </div>
 
-          {/* 课程大纲（仅课程显示） */}
-          {product.type === "course" && <CourseContent syllabus={product.syllabus} />}
+          {/* 课程大纲 */}
+          <CourseContent syllabus={product.syllabus} />
 
           {/* 评论区 */}
           <CommentSection comments={product.comments} courseId={product.id} />
@@ -107,22 +116,45 @@ export default async function ProductPage({ params }: Props) {
 
         {/* 右侧信息栏 */}
         <div className="space-y-6">
-          {/* 价格信息 */}
+          {/* 购买按钮 */}
           <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-3xl font-bold text-blue-600 mb-4">¥{product.price.toFixed(2)}</div>
-            <button className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600">
-              立即购买
-            </button>
+            <div className="flex items-center justify-between mb-4">
+              <Image
+                src={product.platform.icon}
+                alt={product.platform.name}
+                width={32}
+                height={32}
+                className="object-contain"
+              />
+              <span className="text-lg text-gray-600">{product.platform.name}</span>
+            </div>
+            <a
+              href={product.platformUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 text-center"
+            >
+              前往购买
+            </a>
           </div>
 
-          {/* 微信群二维码（仅课程显示） */}
-          {product.type === "course" && product.qrCode && (
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-medium mb-4">加入学习群</h3>
-              <div className="relative aspect-square">
-                <Image src={product.qrCode} alt="微信群二维码" fill className="object-contain" />
+          {/* 微信群二维码 */}
+          {product.qrCode && (
+            <div className="bg-white rounded-lg shadow p-6 space-y-6">
+              <div>
+                <h3 className="text-lg font-medium mb-4">加入学习群</h3>
+                <div className="relative aspect-square">
+                  <Image src={product.qrCode} alt="微信群二维码" fill className="object-contain" />
+                </div>
+                <p className="text-sm text-gray-500 mt-2 text-center">扫码加入课程微信群</p>
               </div>
-              <p className="text-sm text-gray-500 mt-2 text-center">扫码加入课程微信群</p>
+
+              {product.messages.length > 0 && (
+                <GroupMessages
+                  messages={product.messages.slice(0, 3)}
+                  allMessages={product.messages}
+                />
+              )}
             </div>
           )}
         </div>
