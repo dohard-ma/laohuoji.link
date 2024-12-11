@@ -4,11 +4,7 @@ const prisma = new PrismaClient();
 
 // 添加类型定义
 interface CreatedPlatforms {
-  [key: string]: {
-    id: string;
-    name: string;
-    icon: string;
-  };
+  [key: string]: any;
 }
 
 async function main() {
@@ -18,42 +14,104 @@ async function main() {
   await prisma.product.deleteMany();
   await prisma.platform.deleteMany();
   await prisma.user.deleteMany();
+  await prisma.tag.deleteMany();
 
-  // 创建测试用户
+  // 1. 创建标签
+  const parentTags = [
+    { name: "产品", category: "skill", level: 1 },
+    { name: "技术", category: "skill", level: 1 },
+    { name: "设计", category: "skill", level: 1 },
+    { name: "产品方法论", category: "method", level: 1 },
+  ];
+
+  const tagMap = new Map();
+
+  for (const tag of parentTags) {
+    const created = await prisma.tag.upsert({
+      where: { name: tag.name },
+      update: {},
+      create: tag,
+    });
+    tagMap.set(tag.name, created.id);
+  }
+
+  const childTags = [
+    { name: "产品经理", category: "skill", level: 2, parentName: "产品" },
+    { name: "用户研究", category: "skill", level: 2, parentName: "产品" },
+    { name: "数据分析", category: "skill", level: 2, parentName: "产品" },
+    { name: "前端开发", category: "skill", level: 2, parentName: "技术" },
+    { name: "React", category: "skill", level: 3, parentName: "前端开发" },
+    { name: "Vue", category: "skill", level: 3, parentName: "前端开发" },
+    { name: "设计思维", category: "method", level: 2, parentName: "产品方法论" },
+  ];
+
+  for (const tag of childTags) {
+    const { parentName, ...tagData } = tag;
+    await prisma.tag.upsert({
+      where: { name: tag.name },
+      update: {},
+      create: {
+        ...tagData,
+        ...(parentName && tagMap.has(parentName)
+          ? { parent: { connect: { id: tagMap.get(parentName) } } }
+          : {}),
+      },
+    });
+  }
+
+  // 2. 创建用户
   const users = [
     {
       email: "test1@example.com",
       password: await hash("123456", 12),
       name: "测试用户1",
       avatar: "/api/avatar?name=测试用户1",
+      specialties: "产品设计、用户研究、数据分析",
+      needs: "想学习前端开发和设计思维",
+      skillTags: {
+        connect: [
+          { name: "产品" },
+          { name: "产品经理" },
+          { name: "用户研究" },
+          { name: "数据分析" },
+        ],
+      },
+      needTags: {
+        connect: [{ name: "技术" }, { name: "前端开发" }, { name: "设计思维" }],
+      },
     },
     {
       email: "test2@example.com",
       password: await hash("123456", 12),
       name: "测试用户2",
       avatar: "/api/avatar?name=测试用户2",
+      specialties: "前端开发、React、Vue",
+      needs: "想提升产品思维和用户研究能力",
+      skillTags: {
+        connect: [{ name: "技术" }, { name: "前端开发" }, { name: "React" }, { name: "Vue" }],
+      },
+      needTags: {
+        connect: [{ name: "产品" }, { name: "产品经理" }, { name: "用户研究" }],
+      },
     },
   ];
 
   for (const userData of users) {
-    await prisma.user.create({ data: userData });
+    await prisma.user.create({
+      data: userData,
+      include: {
+        skillTags: true,
+        needTags: true,
+      },
+    });
   }
 
-  // 创建平台
+  // 3. 创建平台和产品
   const platforms = [
-    {
-      name: "知识星球",
-      icon: "/platforms/zsxq.png",
-    },
-    {
-      name: "小报童",
-      icon: "/platforms/xbt.png",
-    },
-    {
-      name: "飞书",
-      icon: "/platforms/feishu.png",
-    },
-  ] as const;
+    { name: "知识星球", icon: "/platforms/zsxq.png" },
+    { name: "小报童", icon: "/platforms/xbt.png" },
+    { name: "飞书", icon: "/platforms/feishu.png" },
+  ];
 
   const createdPlatforms: CreatedPlatforms = {};
   for (const platform of platforms) {
@@ -61,120 +119,133 @@ async function main() {
     createdPlatforms[platform.name] = created;
   }
 
-  // 创建测试数据
-  const products = [
+  // 创建产品数据
+  const productData = [
     {
       title: "产品经理入门课程",
-      description: "从零开始学习产品经理必备知识和技能，包含需求分析、产品设计、项目管理等内容。",
+      description: "从零开始学习产品经理必备技能，包括用户研究、需求分析、产品规划等内容。",
       platformId: createdPlatforms["知识星球"].id,
       platformUrl: "https://zsxq.com/example1",
-      imageUrl: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40",
-      qrCode: "/qrcodes/zsxq-group.png",
+      imageUrl: "/products/product1.png",
+      qrCode: "/qrcodes/group1.png",
       syllabus: [
-        {
-          title: "产品经理的角色与职责",
-          content: "1. 什么是产品经理\n2. 产品经理的日常工作\n3. 必备技能和工具",
-          date: "2024-03-20",
-        },
-        {
-          title: "需求分析与管理",
-          content: "1. 需求收集方法\n2. 需求分析框架\n3. 需求文档撰写",
-          date: "2024-03-21",
-        },
+        { title: "产品经理概述", content: "什么是产品经理，职责和技能要求", date: "2024-03-01" },
+        { title: "用户研究方法", content: "用户访谈、问卷调查、用户画像", date: "2024-03-02" },
+        { title: "需求分析", content: "需求收集、分析和优先级排序", date: "2024-03-03" },
+        { title: "产品规划", content: "产品路线图、版本规划、特性规划", date: "2024-03-04" },
       ],
       tags: {
-        connect: [{ name: "产品经理" }, { name: "入门课程" }],
-      },
-      messages: {
-        create: [
-          {
-            content:
-              "大家好，欢迎加入产品经理入门课程学习群！我是课程讲师姜胡说。这里会分享一些课程补充内容和实践案例。",
-            createdAt: new Date("2024-03-10T10:00:00Z"),
-          },
-          {
-            content:
-              "今天我们来聊聊如何做好用户调研。\n\n1. 确定调研目标\n2. 选择合适的调研方法\n3. 设计调研问题\n4. 招募合适的受访者\n5. 执行调研\n6. 整理和分析数据\n\n大家在实践中有遇到什么问题，欢迎在群里讨论。",
-            createdAt: new Date("2024-03-11T14:30:00Z"),
-          },
-          {
-            content:
-              "分享一个实用的产品需求文档模板，适合刚入门的同学使用：https://example.com/prd-template\n\n包含了：\n- 产品概述\n- 用户场景\n- 功能需求\n- 交互设计\n- 数据指标",
-            createdAt: new Date("2024-03-12T09:15:00Z"),
-          },
-          {
-            content:
-              "本周六下午3点，我们会在线上进行第一次直播答疑，主要解答大家在学习过程中遇到的问题。欢迎准备问题，到时见！",
-            createdAt: new Date("2024-03-13T11:00:00Z"),
-          },
-          {
-            content:
-              "推荐一本产品经理必读的书籍：《用户思维+》\n\n这本书对理解用户需求和产品思维很有帮助，建议大家找时间读一读。",
-            createdAt: new Date("2024-03-14T16:45:00Z"),
-          },
+        connect: [
+          { name: "产品" },
+          { name: "产品经理" },
+          { name: "用户研究" },
+          { name: "产品方法论" },
         ],
+      },
+    },
+    {
+      title: "前端开发实战",
+      description: "深入学习现代前端开发技术，包括React、Vue等主流框架的实践应用。",
+      platformId: createdPlatforms["小报童"].id,
+      platformUrl: "https://xbt.com/example2",
+      imageUrl: "/products/product2.png",
+      qrCode: "/qrcodes/group2.png",
+      syllabus: [
+        { title: "现代前端概述", content: "前端发展历史和技术栈介绍", date: "2024-03-10" },
+        { title: "React基础", content: "React核心概念和基本使用", date: "2024-03-11" },
+        { title: "Vue基础", content: "Vue核心概念和基本使用", date: "2024-03-12" },
+        { title: "实战项目", content: "综合项目实践", date: "2024-03-13" },
+      ],
+      tags: {
+        connect: [{ name: "技术" }, { name: "前端开发" }, { name: "React" }, { name: "Vue" }],
       },
     },
     {
       title: "设计思维工作坊",
-      description: "通过实践学习设计思维方法论，解决实际业务问题。为期两天的线下工作坊。",
-      platformId: createdPlatforms["小报童"].id,
-      platformUrl: "https://xbt.com/example2",
-      imageUrl: "https://images.unsplash.com/photo-1531403009284-440f080d1e12",
-      qrCode: "/qrcodes/xbt-group.png",
-      tags: {
-        connect: [{ name: "设计思维" }, { name: "工作坊" }],
-      },
-      messages: {
-        create: [
-          {
-            content:
-              "工作坊微信群开通啦！请大家提前预习设计思维的基础概念，下周的工作坊会直接进入实践环节。",
-            createdAt: new Date("2024-03-01T10:00:00Z"),
-          },
-          {
-            content:
-              "设计思维五个阶段：\n1. 同理心\n2. 定义问题\n3. 头脑风暴\n4. 原型设计\n5. 测试验证\n\n我们的工作坊会围绕这些阶段展开实践。",
-            createdAt: new Date("2024-03-02T15:20:00Z"),
-          },
-          {
-            content:
-              "请大家准备好便利贴和记号笔，工作坊上会用到很多这些工具进行头脑风暴和原型设计。",
-            createdAt: new Date("2024-03-03T09:30:00Z"),
-          },
-        ],
-      },
-    },
-    {
-      title: "产品复盘模板",
-      description: "帮助产品经理进行项目复盘的模板工具，包含多个维度的分析框架。",
+      description: "通过实践学习设计思维方法，解决实际产品问题。",
       platformId: createdPlatforms["飞书"].id,
       platformUrl: "https://feishu.com/example3",
-      imageUrl: "https://images.unsplash.com/photo-1572021335469-31706a17aaef",
-      qrCode: "/qrcodes/feishu-group.png",
+      imageUrl: "/products/product3.png",
+      qrCode: "/qrcodes/group3.png",
+      syllabus: [
+        { title: "设计思维简介", content: "设计思维的基本概念和应用场景", date: "2024-03-20" },
+        { title: "共情与定义", content: "用户共情和问题定义方法", date: "2024-03-21" },
+        { title: "创意与原型", content: "创意发散和原型制作", date: "2024-03-22" },
+        { title: "测试与迭代", content: "原型测试和迭代优化", date: "2024-03-23" },
+      ],
       tags: {
-        connect: [{ name: "产品工具" }, { name: "模板" }],
+        connect: [{ name: "设计" }, { name: "产品方法论" }, { name: "设计思维" }],
       },
     },
   ];
 
-  // 先创建标签
-  const tags = ["产品经理", "入门课程", "设计思维", "工作坊", "产品工具", "模板"];
-
-  for (const tagName of tags) {
-    await prisma.tag.upsert({
-      where: { name: tagName },
-      update: {},
-      create: { name: tagName },
-    });
-  }
-
   // 创建产品
-  for (const product of products) {
-    await prisma.product.create({
-      data: product,
+  const createdProducts = [];
+  for (const data of productData) {
+    const product = await prisma.product.create({
+      data: {
+        ...data,
+        syllabus: JSON.stringify(data.syllabus),
+      },
+    });
+    createdProducts.push(product);
+  }
+
+  // 创建群消息历史记录
+  const messages = [
+    {
+      content: "大家好，欢迎加入课程群！",
+      createdAt: new Date("2024-03-01T10:00:00Z"),
+    },
+    {
+      content: "请大家先做一下自我介绍吧",
+      createdAt: new Date("2024-03-01T10:05:00Z"),
+    },
+    {
+      content: "我是小王，是一名产品经理，希望通过这个课程提升设计思维",
+      createdAt: new Date("2024-03-01T10:10:00Z"),
+    },
+    {
+      content: "大家好，我叫小李，是一名前端开发，想学习一下产品思维",
+      createdAt: new Date("2024-03-01T10:15:00Z"),
+    },
+    {
+      content: "今天的课程主题是「用户研究方法」",
+      createdAt: new Date("2024-03-02T14:00:00Z"),
+    },
+    {
+      content: "课程会从基础的用户访谈方法开始讲起",
+      createdAt: new Date("2024-03-02T14:05:00Z"),
+    },
+    {
+      content: "请大家准备好笔记工具",
+      createdAt: new Date("2024-03-02T14:10:00Z"),
+    },
+    {
+      content: "课程结束后我们会有一个小作业",
+      createdAt: new Date("2024-03-02T15:55:00Z"),
+    },
+    {
+      content: "大家记得完成并提交哦",
+      createdAt: new Date("2024-03-02T16:00:00Z"),
+    },
+    {
+      content: "我的作业已经提交了，请老师查看",
+      createdAt: new Date("2024-03-03T09:00:00Z"),
+    },
+  ];
+
+  // 为每个产品创建群消息
+  for (const product of createdProducts) {
+    await prisma.groupMessage.createMany({
+      data: messages.map((msg) => ({
+        ...msg,
+        productId: product.id,
+      })),
     });
   }
+
+  console.log("群消息创建成功");
 
   console.log("测试数据添加成功！");
 }

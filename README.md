@@ -1,4 +1,4 @@
-# 姜胡说 线上共创平台
+# 姜胡说 导航站
 
 > [需求文档](https://ld24rg3ixq.feishu.cn/docx/QvmadHs1qo9cXjxuE2OcoeNJnnd)
 

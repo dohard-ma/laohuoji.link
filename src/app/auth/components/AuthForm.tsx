@@ -3,18 +3,35 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Tag } from "@prisma/client";
+import TagSelection from "./TagSelection";
+
+interface FormData {
+  email: string;
+  password: string;
+  name?: string;
+  bio?: string;
+  specialties?: string;
+  needs?: string;
+}
 
 export default function AuthForm() {
+  const router = useRouter();
   const [isLogin, setIsLogin] = useState(true);
-  const [formData, setFormData] = useState({
+  const [step, setStep] = useState<"form" | "tags">("form");
+  const [formData, setFormData] = useState<FormData>({
     email: "",
     password: "",
     name: "",
     bio: "",
+    specialties: "",
+    needs: "",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
+  const [selectedSkillTags, setSelectedSkillTags] = useState<Tag[]>([]);
+  const [selectedNeedTags, setSelectedNeedTags] = useState<Tag[]>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,27 +53,38 @@ export default function AuthForm() {
           router.refresh();
         }
       } else {
-        const res = await fetch("/api/auth/register", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          setError(data.error);
+        if (step === "form") {
+          // 进入标签选择步骤
+          setStep("tags");
         } else {
-          // 注册成功后自动登录
-          const result = await signIn("credentials", {
-            email: formData.email,
-            password: formData.password,
-            redirect: false,
+          // 完成注册
+          const res = await fetch("/api/auth/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              ...formData,
+              avatar: `/api/avatar?name=${formData.name}`,
+              skillTags: selectedSkillTags,
+              needTags: selectedNeedTags,
+            }),
           });
 
-          if (result?.ok) {
-            router.push("/");
-            router.refresh();
+          const data = await res.json();
+
+          if (!res.ok) {
+            setError(data.error);
+          } else {
+            // 注册成功后自动登录
+            const result = await signIn("credentials", {
+              email: formData.email,
+              password: formData.password,
+              redirect: false,
+            });
+
+            if (result?.ok) {
+              router.push("/");
+              router.refresh();
+            }
           }
         }
       }
@@ -66,6 +94,19 @@ export default function AuthForm() {
       setLoading(false);
     }
   };
+
+  if (!isLogin && step === "tags") {
+    return (
+      <TagSelection
+        onSubmit={handleSubmit}
+        onBack={() => setStep("form")}
+        onSkillTagsChange={setSelectedSkillTags}
+        onNeedTagsChange={setSelectedNeedTags}
+        loading={loading}
+        error={error}
+      />
+    );
+  }
 
   return (
     <div className="bg-white p-8 rounded-lg shadow-md">
@@ -125,6 +166,26 @@ export default function AuthForm() {
                 minLength={10}
                 maxLength={200}
                 placeholder="简单介绍一下自己吧..."
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">擅长领域</label>
+              <textarea
+                value={formData.specialties}
+                onChange={(e) => setFormData({ ...formData, specialties: e.target.value })}
+                className="w-full p-2 border rounded-md"
+                placeholder="描述你的专长和可以提供的资源..."
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">需求领域</label>
+              <textarea
+                value={formData.needs}
+                onChange={(e) => setFormData({ ...formData, needs: e.target.value })}
+                className="w-full p-2 border rounded-md"
+                placeholder="描述你的需求和想学习的内容..."
               />
             </div>
           </>

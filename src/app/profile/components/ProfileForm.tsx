@@ -3,27 +3,49 @@
 import { useState } from "react";
 import { User, Tag, Badge } from "@prisma/client";
 import Image from "next/image";
-import TagSelector from "./TagSelector";
+import { Badge as UIBadge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 import BadgeList from "./BadgeList";
 import { useRouter } from "next/navigation";
+import TagSelector from "./TagSelector";
 
-type ProfileFormProps = {
-  user: User & {
-    tags: Tag[];
-    badges: Badge[];
-  };
+type UserWithRelations = User & {
+  skillTags: Tag[];
+  needTags: Tag[];
+  badges: Badge[];
 };
 
-export default function ProfileForm({ user }: ProfileFormProps) {
+interface Props {
+  user: UserWithRelations;
+  availableTags: Tag[];
+  readOnly?: boolean;
+}
+
+export default function ProfileForm({ user, availableTags, readOnly = false }: Props) {
+  const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
     name: user.name || "",
     bio: user.bio || "",
-    specialties: user.specialties || [],
-    needs: user.needs || [],
+    specialties: user.specialties || "",
+    needs: user.needs || "",
+    skillTags: user.skillTags || [],
+    needTags: user.needTags || [],
   });
-  const router = useRouter();
+  const [openSkills, setOpenSkills] = useState(false);
+  const [openNeeds, setOpenNeeds] = useState(false);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files?.[0]) return;
@@ -86,6 +108,8 @@ export default function ProfileForm({ user }: ProfileFormProps) {
               src={user.avatar || "/default-avatar.png"}
               alt="头像"
               fill
+              sizes="(max-width: 96px) 100vw, 96px"
+              priority
               className="rounded-full object-cover"
             />
             {uploading && (
@@ -105,12 +129,14 @@ export default function ProfileForm({ user }: ProfileFormProps) {
             />
           </label>
         </div>
-        <button
-          onClick={() => setIsEditing(!isEditing)}
-          className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-        >
-          {isEditing ? "取消" : "编辑"}
-        </button>
+        {!readOnly && (
+          <button
+            onClick={() => setIsEditing(!isEditing)}
+            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+          >
+            {isEditing ? "取消" : "编辑"}
+          </button>
+        )}
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -142,45 +168,114 @@ export default function ProfileForm({ user }: ProfileFormProps) {
           )}
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">擅长领域</label>
-          {isEditing ? (
-            <TagSelector
-              category="specialty"
-              selected={formData.specialties}
-              onChange={(tags) => setFormData({ ...formData, specialties: tags })}
-            />
-          ) : (
-            <div className="flex flex-wrap gap-2">
-              {formData.specialties.map((tag) => (
-                <span key={tag} className="px-2 py-1 bg-blue-100 text-blue-800 rounded-md text-sm">
-                  {tag}
-                </span>
+        <div className="mb-6 space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-2">擅长领域描述</label>
+            {isEditing ? (
+              <textarea
+                value={formData.specialties}
+                onChange={(e) => setFormData({ ...formData, specialties: e.target.value })}
+                className="w-full p-2 border rounded-md"
+                placeholder="描述你的专长和可以提供的资源..."
+              />
+            ) : (
+              <p className="text-gray-700 whitespace-pre-line">{formData.specialties}</p>
+            )}
+          </div>
+
+          <div className="mb-6">
+            <label className="block text-sm font-medium mb-2">技能标签</label>
+            <div className="flex flex-wrap gap-2 mb-2">
+              {formData.skillTags.map((tag) => (
+                <UIBadge key={tag.id} variant="default" className="text-sm">
+                  {tag.name}
+                  {isEditing && (
+                    <button
+                      className="ml-1 hover:text-red-500"
+                      onClick={() => {
+                        setFormData({
+                          ...formData,
+                          skillTags: formData.skillTags.filter((t) => t.id !== tag.id),
+                        });
+                      }}
+                    >
+                      ×
+                    </button>
+                  )}
+                </UIBadge>
               ))}
             </div>
-          )}
+            {isEditing && (
+              <TagSelector
+                availableTags={availableTags}
+                selectedTags={formData.skillTags}
+                onSelect={(tag) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    skillTags: [...prev.skillTags, tag],
+                  }));
+                }}
+                open={openSkills}
+                onOpenChange={setOpenSkills}
+                placeholder="选择技能标签..."
+              />
+            )}
+          </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">需求领域</label>
-          {isEditing ? (
-            <TagSelector
-              category="need"
-              selected={formData.needs}
-              onChange={(tags) => setFormData({ ...formData, needs: tags })}
-            />
-          ) : (
-            <div className="flex flex-wrap gap-2">
-              {formData.needs.map((tag) => (
-                <span
-                  key={tag}
-                  className="px-2 py-1 bg-green-100 text-green-800 rounded-md text-sm"
-                >
-                  {tag}
-                </span>
+        <div className="mb-6 space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-2">需求领域描述</label>
+            {isEditing ? (
+              <textarea
+                value={formData.needs}
+                onChange={(e) => setFormData({ ...formData, needs: e.target.value })}
+                className="w-full p-2 border rounded-md"
+                placeholder="描述你的需求和想学习的内容..."
+              />
+            ) : (
+              <p className="text-gray-700 whitespace-pre-line">{formData.needs}</p>
+            )}
+          </div>
+
+          <div className="mb-6">
+            <label className="block text-sm font-medium mb-2">需求标签</label>
+            <div className="flex flex-wrap gap-2 mb-2">
+              {formData.needTags.map((tag) => (
+                <UIBadge key={tag.id} variant="secondary" className="text-sm">
+                  {tag.name}
+                  {isEditing && (
+                    <button
+                      className="ml-1 hover:text-red-500"
+                      onClick={() => {
+                        setFormData({
+                          ...formData,
+                          needTags: formData.needTags.filter((t) => t.id !== tag.id),
+                        });
+                      }}
+                    >
+                      ×
+                    </button>
+                  )}
+                </UIBadge>
               ))}
             </div>
-          )}
+            {isEditing && (
+              <TagSelector
+                availableTags={availableTags}
+                selectedTags={formData.needTags}
+                onSelect={(tag) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    needTags: [...prev.needTags, tag],
+                  }));
+                }}
+                open={openNeeds}
+                onOpenChange={setOpenNeeds}
+                placeholder="选择需求标签..."
+              />
+            )}
+          </div>
         </div>
 
         <div>

@@ -2,7 +2,7 @@ export default function HomePage() {
   return (
     <main className="min-h-screen p-6">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold mb-6">姜胡说 线上共创平台</h1>
+        <h1 className="text-4xl font-bold mb-6">姜胡说 导航站</h1>
 
         <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4">平台介绍</h2>

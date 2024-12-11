@@ -1,45 +1,48 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo } from "react";
 
-type Syllabus = {
+interface SyllabusItem {
   title: string;
   content: string;
   date?: string;
-}[];
+}
 
-type Props = {
-  syllabus: Syllabus | null;
-};
+interface Props {
+  syllabus: string | null;
+}
 
 export default function CourseContent({ syllabus }: Props) {
-  const [activeIndex, setActiveIndex] = useState(0);
+  const syllabusData = useMemo(() => {
+    if (!syllabus) return [];
+    try {
+      return JSON.parse(syllabus) as SyllabusItem[];
+    } catch (error) {
+      console.error("解析课程大纲失败:", error);
+      return [];
+    }
+  }, [syllabus]);
 
-  if (!syllabus) return null;
+  if (!syllabusData.length) {
+    return (
+      <div className="bg-gray-50 p-6 rounded-lg">
+        <h2 className="text-2xl font-bold mb-6">课程大纲</h2>
+        <p className="text-gray-500">暂无课程大纲</p>
+      </div>
+    );
+  }
 
   return (
-    <div>
+    <div className="bg-gray-50 p-6 rounded-lg">
       <h2 className="text-2xl font-bold mb-6">课程大纲</h2>
-      <div className="border rounded-lg overflow-hidden">
-        {syllabus.map((item, index) => (
-          <div key={index} className="border-b last:border-b-0">
-            <button
-              onClick={() => setActiveIndex(index)}
-              className="w-full px-6 py-4 text-left hover:bg-gray-50 focus:outline-none"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <span className="text-gray-500">Day {index + 1}</span>
-                  <span className="font-medium">{item.title}</span>
-                </div>
-                {item.date && <span className="text-sm text-gray-500">{item.date}</span>}
-              </div>
-            </button>
-            {activeIndex === index && (
-              <div className="px-6 py-4 bg-gray-50">
-                <p className="text-gray-600 whitespace-pre-line">{item.content}</p>
-              </div>
-            )}
+      <div className="border rounded-lg overflow-hidden divide-y">
+        {syllabusData.map((item, index) => (
+          <div key={index} className="p-4 bg-white hover:bg-gray-50 transition-colors">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-lg font-medium">{item.title}</h3>
+              {item.date && <span className="text-sm text-gray-500">{item.date}</span>}
+            </div>
+            <p className="text-gray-600">{item.content}</p>
           </div>
         ))}
       </div>

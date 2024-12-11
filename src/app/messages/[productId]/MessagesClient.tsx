@@ -117,7 +117,7 @@ export default function MessagesClient({ product }: MessagesClientProps) {
       // 转换为图片并下载
       const dataUrl = canvas.toDataURL("image/png");
       const link = document.createElement("a");
-      link.download = `群消息-${new Date().toLocaleDateString()}.png`;
+      link.download = `动态-${new Date().toLocaleDateString()}.png`;
       link.href = dataUrl;
       link.click();
 
@@ -137,7 +137,7 @@ export default function MessagesClient({ product }: MessagesClientProps) {
               <Link href={`/products/${product.id}`} className="text-gray-500">
                 <ChevronLeft className="h-6 w-6" />
               </Link>
-              <h1 className="text-lg font-medium">群消息历史</h1>
+              <h1 className="text-lg font-medium">动态历史</h1>
             </div>
           </div>
         </div>

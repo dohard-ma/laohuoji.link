@@ -4,7 +4,7 @@ import Image from "next/image";
 import CommentSection from "../components/CommentSection";
 import CourseContent from "../components/CourseContent";
 import { Metadata } from "next";
-import { Product, Tag, Comment, Platform } from "@prisma/client";
+import { Product, Tag, Comment, Platform, Message } from "@prisma/client";
 import GroupMessages from "../components/GroupMessages";
 
 type Props = {
@@ -22,7 +22,7 @@ type ProductWithRelations = Product & {
   })[];
   syllabus?: any;
   qrCode?: string | null;
-  messages: any[];
+  messages: Message[];
 };
 
 // 动态生成页面元数据
@@ -43,14 +43,28 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+interface Product {
+  id: string;
+  title: string;
+  description: string;
+  platformId: string;
+  platformUrl: string;
+  imageUrl: string | null;
+  qrCode: string | null;
+  syllabus: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  platform: Platform;
+  tags: Tag[];
+  comments: Comment[];
+}
+
 export default async function ProductPage({ params }: Props) {
-  const product = (await prisma.product.findUnique({
-    where: {
-      id: params.id,
-    },
+  const product = await prisma.product.findUnique({
+    where: { id: params.id },
     include: {
-      tags: true,
       platform: true,
+      tags: true,
       comments: {
         include: {
           user: {
@@ -70,14 +84,14 @@ export default async function ProductPage({ params }: Props) {
         },
       },
     },
-  })) as ProductWithRelations;
+  });
 
   if (!product) {
     notFound();
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="max-w-4xl mx-auto p-6">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* 左侧主要内容 */}
         <div className="lg:col-span-2 space-y-8">

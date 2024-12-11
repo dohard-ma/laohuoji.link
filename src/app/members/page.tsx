@@ -1,94 +1,77 @@
 import prisma from "@/lib/prisma";
 import MemberList from "./components/MemberList";
 import MemberFilter from "./components/MemberFilter";
-import { Metadata } from "next";
 import { Prisma } from "@prisma/client";
-
-export const metadata: Metadata = {
-  title: "社群成员 - 姜胡说",
-  description: "浏览姜胡说社群的所有成员",
-};
 
 export default async function MembersPage({
   searchParams,
 }: {
-  searchParams: { query?: string; tags?: string };
+  searchParams: { [key: string]: string | string[] | undefined };
 }) {
-  // 获取所有标签
-  const tags = await prisma.tag.findMany({
-    orderBy: [{ id: "desc" }],
-  });
+  // 处理过滤条件
+  const filters: Prisma.UserWhereInput[] = [];
 
-  // 构建查询条件
-  const where: Prisma.UserWhereInput = {
-    AND: [
-      // 搜索条件
-      searchParams.query
-        ? {
-            OR: [
-              {
-                name: {
-                  contains: searchParams.query,
-                  mode: "insensitive" as Prisma.QueryMode,
-                },
-              },
-              {
-                bio: {
-                  contains: searchParams.query,
-                  mode: "insensitive" as Prisma.QueryMode,
-                },
-              },
-            ],
-          }
-        : {},
-      // 标签筛选
-      searchParams.tags
-        ? {
-            OR: [
-              {
-                specialties: {
-                  has: searchParams.tags,
-                },
-              },
-              {
-                needs: {
-                  has: searchParams.tags,
-                },
-              },
-              {
-                tags: {
-                  some: {
-                    name: searchParams.tags,
-                  },
-                },
-              },
-            ],
-          }
-        : {},
-    ],
-  };
+  // 处理搜索
+  const search = searchParams.search?.toString();
+  if (search) {
+    filters.push({
+      OR: [
+        { name: { contains: search, mode: "insensitive" } },
+        { bio: { contains: search, mode: "insensitive" } },
+      ],
+    });
+  }
+
+  // 处理标签过滤
+  const tagIds = searchParams.tags?.toString().split(",").filter(Boolean);
+  if (tagIds?.length) {
+    filters.push({
+      OR: [
+        {
+          skillTags: {
+            some: {
+              id: { in: tagIds },
+            },
+          },
+        },
+        {
+          needTags: {
+            some: {
+              id: { in: tagIds },
+            },
+          },
+        },
+      ],
+    });
+  }
 
   // 获取成员列表
   const members = await prisma.user.findMany({
-    where,
+    where: {
+      AND: filters,
+    },
     include: {
-      tags: true,
+      skillTags: true,
+      needTags: true,
       badges: true,
     },
-    orderBy: { updatedAt: "desc" },
+    orderBy: {
+      updatedAt: "desc",
+    },
+  });
+
+  // 获取所有标签供过滤使用
+  const tags = await prisma.tag.findMany({
+    orderBy: {
+      name: "asc",
+    },
   });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">社群成员</h1>
-      <div className="flex flex-col lg:flex-row gap-8">
-        <div className="w-full lg:w-64 flex-shrink-0">
-          <MemberFilter tags={tags} />
-        </div>
-        <div className="flex-grow">
-          <MemberList members={members} />
-        </div>
-      </div>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold mb-6">社群成员</h1>
+      <MemberFilter tags={tags} />
+      <MemberList members={members} />
     </div>
   );
 }

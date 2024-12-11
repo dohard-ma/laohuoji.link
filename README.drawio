@@ -1,0 +1,164 @@
+<mxfile host="65bd71144e">
+    <diagram id="KgMGxqoLUaYVgXGHu1XJ" name="Page-1">
+        <mxGraphModel dx="766" dy="713" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="5" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="2" target="3" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="2" value="开始" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="350" y="160" width="120" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="3" target="4" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="用户在微信群讨论" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="350" y="280" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="4" target="8" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="410" y="500" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="4" value="微信机器人&lt;br&gt;自动收集到到平台" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="350" y="390" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="10" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="8" target="9" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" value="平台每日&lt;br&gt;通过图片推送" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="350" y="500" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="12" style="edgeStyle=none;html=1;" parent="1" source="9" target="11" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="9" value="用户识别二维码&lt;br&gt;进入平台&lt;br&gt;查看每日概要" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="350" y="620" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="14" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="11" target="13" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="16" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="11" target="15" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" value="点击关键字和话题" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="350" y="730" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="13" value="跳转到历史相关话题的讨论记录" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="230" y="850" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="15" value="跳转到相关话题的&lt;br&gt;专栏（内容沉淀）" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+                    <mxGeometry x="480" y="850" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="17" value="和知识星球有重复&lt;br&gt;是否涉及到要收费的内容？&lt;br&gt;谁来维护？" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="455" y="915" width="170" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="22" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="18" target="25" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="970" y="490" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="18" value="用户识别二维码&lt;br&gt;进入平台" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="910" y="360" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="20" style="edgeStyle=none;html=1;" parent="1" source="19" target="18" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="19" value="开始" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="910" y="220" width="120" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="27" value="未登录" style="edgeStyle=none;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="25" target="26" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="42" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="25" target="30" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="25" value="用户是否登录" style="rhombus;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="930" y="480" width="80" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="39" style="edgeStyle=none;html=1;" parent="1" source="26" target="38" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="26" value="跳转到登录" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="1140" y="490" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="43" style="edgeStyle=none;html=1;" parent="1" source="30" target="32" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="30" value="跳转到&lt;br&gt;微信群消息历史列表" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="910" y="620" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="32" value="可以再跳转到&lt;br&gt;产品详情页" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="910" y="750" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="38" value="跳转到首页" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="1350" y="490" width="120" height="60" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram id="eyDsnA5mSAOvbwk1mwES" name="第 2 页">
+        <mxGraphModel dx="766" dy="713" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="8RH-FM5dbek7KVsgX-4o-1" value="重新计算年龄" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="293" y="213" width="87" height="27" as="geometry"/>
+                </mxCell>
+                <mxCell id="8RH-FM5dbek7KVsgX-4o-2" value="20岁" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+                    <mxGeometry x="189" y="210" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="8RH-FM5dbek7KVsgX-4o-3" value="年龄：" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="138" y="212" width="54" height="26" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram id="PuujgRms9GtLU47nIiLF" name="tag">
+        <mxGraphModel dx="766" dy="713" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="wU1hqgH6AJe1bAMgQO0Z-9" value="人" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="140" y="245" width="125" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="wU1hqgH6AJe1bAMgQO0Z-5" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" edge="1" parent="1" source="wU1hqgH6AJe1bAMgQO0Z-9" target="wU1hqgH6AJe1bAMgQO0Z-2">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="330" y="170" as="sourcePoint"/>
+                        <Array as="points">
+                            <mxPoint x="370" y="150"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="wU1hqgH6AJe1bAMgQO0Z-14" style="edgeStyle=none;html=1;" edge="1" parent="1" source="wU1hqgH6AJe1bAMgQO0Z-2" target="wU1hqgH6AJe1bAMgQO0Z-13">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="wU1hqgH6AJe1bAMgQO0Z-2" value="产品" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="450" y="245" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="wU1hqgH6AJe1bAMgQO0Z-4" value="tag" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="340" y="260" width="40" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="wU1hqgH6AJe1bAMgQO0Z-8" value="关注" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="340" y="160" width="50" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="wU1hqgH6AJe1bAMgQO0Z-11" value="通知：&lt;br&gt;1. 关注的产品的信息通知&lt;br&gt;2. 平台根据tag推荐通知" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="300" y="446" width="160" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="wU1hqgH6AJe1bAMgQO0Z-12" value="资源对应的有多少人&lt;br&gt;需求对应的有多少人&lt;br&gt;参与了哪些产品" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="139" y="310" width="126" height="55" as="geometry"/>
+                </mxCell>
+                <mxCell id="wU1hqgH6AJe1bAMgQO0Z-15" style="edgeStyle=none;html=1;" edge="1" parent="1" source="wU1hqgH6AJe1bAMgQO0Z-13" target="wU1hqgH6AJe1bAMgQO0Z-9">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="wU1hqgH6AJe1bAMgQO0Z-13" value="站内通知" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="300" y="380" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="wU1hqgH6AJe1bAMgQO0Z-16" value="哪些产品是大家都需要的？&lt;br&gt;产品应该推荐给哪些人？&lt;br&gt;参与的有哪些人" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="480" y="303" width="162" height="55" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
